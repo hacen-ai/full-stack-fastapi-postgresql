@@ -1,8 +1,8 @@
-version: "3.3"
+version: "3.8"
 services:
 
   proxy:
-    image: traefik:v2.2
+    image: traefik
     networks:
       - ${TRAEFIK_PUBLIC_NETWORK?Variable not set}
       - default
@@ -69,7 +69,8 @@ services:
         - traefik.http.routers.${STACK_NAME?Variable not set}-proxy-http.middlewares=${STACK_NAME?Variable not set}-www-redirect,${STACK_NAME?Variable not set}-https-redirect
 
   db:
-    image: postgres:12
+    image: postgres:14
+    container_name: pg-container
     volumes:
       - app-db-data:/var/lib/postgresql/data/pgdata
     env_file:
@@ -83,6 +84,7 @@ services:
 
   pgadmin:
     image: dpage/pgadmin4
+    container_name: pgadmin4_container
     networks:
       - ${TRAEFIK_PUBLIC_NETWORK?Variable not set}
       - default
@@ -105,7 +107,7 @@ services:
         - traefik.http.services.${STACK_NAME?Variable not set}-pgadmin.loadbalancer.server.port=5050
 
   queue:
-    image: rabbitmq:3
+    image: rabbitmq
     # Using the below image instead is required to enable the "Broker" tab in the flower UI:
     # image: rabbitmq:3-management
     #
